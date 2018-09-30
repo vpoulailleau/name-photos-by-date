@@ -1,6 +1,6 @@
 # name-photos-by-date
 
-Rename photos according to the date they were taken.
+Rename photos according to the date they were taken. Adds a SHA1 in the filename, in case several photos were taken during the same second (because of burst mode, or the usage of several cameras at the same time).
 
 # Licence
 
