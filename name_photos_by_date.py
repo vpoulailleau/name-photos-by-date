@@ -2,6 +2,7 @@ import argparse
 import datetime
 import hashlib
 import logging
+from multiprocessing import Pool
 import os
 import re
 import shutil
@@ -11,7 +12,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s :: %(levelname)10s :: '
+    '%(filename)s:%(funcName)s :: %(message)s')
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
@@ -79,24 +82,32 @@ def correct_date(date, args):
     return date
 
 
+def rename_an_image(filepath):
+    logger.debug('managing ' + filepath)
+    date_time_original = extract_date(filepath)
+    date = correct_date(date_time_original, args)
+    date = date.strftime('%Y-%m-%d--%H-%M-%S')
+    sha1 = compute_sha1(filepath)
+    new_file_name = f'{args.directory_output}/{date}_{sha1}.jpg'
+    shutil.move(filepath, new_file_name)
+    logger.info('created ' + new_file_name)
+
+
 def process(args):
     try:
         os.mkdir(args.directory_output)
     except FileExistsError:
         logger.debug('output directory was already created')
 
+    images = []
     for entry in os.listdir(args.directory_input):
         extension = entry.split('.')[-1].lower()
         full_image_name = args.directory_input + '/' + entry
         if extension in ('jpg', 'jpeg'):
-            logger.debug('managing ' + entry)
-            date_time_original = extract_date(full_image_name)
-            date = correct_date(date_time_original, args)
-            date = date.strftime('%Y-%m-%d--%H-%M-%S')
-            sha1 = compute_sha1(full_image_name)
-            new_file_name = f'{args.directory_output}/{date}_{sha1}.jpg'
-            shutil.move(full_image_name, new_file_name)
-            logger.info('created ' + new_file_name)
+            images.append(full_image_name)
+
+    pool = Pool(processes=8)
+    pool.map(rename_an_image, images, 10)
 
 
 if __name__ == '__main__':
