@@ -1,7 +1,6 @@
-#!python3
-
 import argparse
 import datetime
+import hashlib
 import logging
 import os
 import re
@@ -15,6 +14,18 @@ stream_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
+
+
+def compute_sha1(filepath):
+    BUF_SIZE = 65536
+    sha1 = hashlib.sha1()
+    with open(filepath, 'rb') as f:
+        while True:
+            data = f.read(BUF_SIZE)
+            if not data:
+                break
+            sha1.update(data)
+    return sha1.hexdigest()
 
 
 def process(args):
@@ -77,18 +88,11 @@ def process(args):
                                     'after time delta: {}'.format(
                                         date_time_original.strftime('%Y-%m-%d--%H-%M-%S')))
 
-                            new_file_name = date_time_original.strftime(
+                            date = date_time_original.strftime(
                                 '%Y-%m-%d--%H-%M-%S')
+                            sha1 = compute_sha1(full_image_name)
 
-                            count = 0
-                            for entry in os.listdir(args.directory_output):
-                                if new_file_name in entry:
-                                    count += 1
-                                    logger.info(
-                                        'Two photos have the same date')
-
-                            new_file_name += '_{}.jpg'.format(count)
-                            new_file_name = args.directory_output + '/' + new_file_name
+                            new_file_name = f'{args.directory_output}/{date}_{sha1}.jpg'
                             shutil.move(
                                 full_image_name, new_file_name)
                             logger.info('created ' + new_file_name)
