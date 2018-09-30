@@ -8,6 +8,7 @@ Rename photos according to the date they were taken.
 
 # Usage
 
+```
 usage: name_photos_by_date.py [-h] [-i DIRECTORY_INPUT] [-o DIRECTORY_OUTPUT]
                               [-a] [-s] [-d N] [-H N] [-m N] [-S N]
 
@@ -27,6 +28,7 @@ Time delta:
   -H N, --hour N        Number of hours in the time delta
   -m N, --minute N      Number of minutes in the time delta
   -S N, --second N      Number of seconds in the time delta
+```
 
 # TODO
 
