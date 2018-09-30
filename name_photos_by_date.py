@@ -85,12 +85,13 @@ def correct_date(date, args):
 def rename_an_image(filepath):
     logger.debug('managing ' + filepath)
     date_time_original = extract_date(filepath)
-    date = correct_date(date_time_original, args)
-    date = date.strftime('%Y-%m-%d--%H-%M-%S')
-    sha1 = compute_sha1(filepath)
-    new_file_name = f'{args.directory_output}/{date}_{sha1}.jpg'
-    shutil.move(filepath, new_file_name)
-    logger.info('created ' + new_file_name)
+    if date_time_original:
+        date = correct_date(date_time_original, args)
+        date = date.strftime('%Y-%m-%d--%H-%M-%S')
+        sha1 = compute_sha1(filepath)
+        new_file_name = f'{args.directory_output}/{date}_{sha1}.jpg'
+        shutil.move(filepath, new_file_name)
+        logger.info('created ' + new_file_name)
 
 
 def process(args):
