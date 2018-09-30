@@ -86,9 +86,9 @@ def process(args):
         logger.debug('output directory was already created')
 
     for entry in os.listdir(args.directory_input):
-        extension = entry.split('.')[-1]
+        extension = entry.split('.')[-1].lower()
         full_image_name = args.directory_input + '/' + entry
-        if extension.lower() in ['jpg', 'jpeg']:
+        if extension in ('jpg', 'jpeg'):
             logger.debug('managing ' + entry)
             date_time_original = extract_date(full_image_name)
             date = correct_date(date_time_original, args)
