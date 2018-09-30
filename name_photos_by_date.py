@@ -29,7 +29,11 @@ def process(args):
         if extension.lower() in ['jpg', 'jpeg']:
             logger.debug('managing ' + entry)
             with subprocess.Popen(
-                    'identify -verbose {}'.format(full_image_name.replace(' ', '\\ ')), shell=True, stdout=subprocess.PIPE, universal_newlines=True) as proc:
+                'identify -verbose {}'.format(
+                    full_image_name.replace(' ', '\\ ')),
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    universal_newlines=True) as proc:
                 found = False
                 for line in proc.stdout.readlines():
                     if 'DateTimeOriginal' in line:
@@ -40,8 +44,13 @@ def process(args):
                             logger.debug('match')
                             found = True
 
-                            date_time_original = datetime.datetime(int(m.group(1)), int(m.group(
-                                2)), int(m.group(3)), int(m.group(4)), int(m.group(5)), int(m.group(6)))
+                            date_time_original = datetime.datetime(
+                                int(m.group(1)),
+                                int(m.group(2)),
+                                int(m.group(3)),
+                                int(m.group(4)),
+                                int(m.group(5)),
+                                int(m.group(6)))
 
                             if args.add or args.substract:
                                 delta = datetime.timedelta()
@@ -57,14 +66,16 @@ def process(args):
                                     delta += datetime.timedelta(
                                         seconds=args.second)
 
-                                logger.debug('before time delta: {}'.format(
-                                    date_time_original.strftime('%Y-%m-%d--%H-%M-%S')))
+                                logger.debug(
+                                    'before time delta: {}'.format(
+                                        date_time_original.strftime('%Y-%m-%d--%H-%M-%S')))
                                 if args.add:
                                     date_time_original += delta
                                 else:
                                     date_time_original -= delta
-                                logger.debug('after time delta: {}'.format(
-                                    date_time_original.strftime('%Y-%m-%d--%H-%M-%S')))
+                                logger.debug(
+                                    'after time delta: {}'.format(
+                                        date_time_original.strftime('%Y-%m-%d--%H-%M-%S')))
 
                             new_file_name = date_time_original.strftime(
                                 '%Y-%m-%d--%H-%M-%S')
@@ -90,28 +101,57 @@ def main():
     parser = argparse.ArgumentParser(
         description="Converts images file names according to their dates")
     parser.add_argument(
-        '-i', '--directory-input', help='Directory in which are the source photos', default='.')
+        '-i',
+        '--directory-input',
+        help='Directory in which are the source photos',
+        default='.')
     parser.add_argument(
-        '-o', '--directory-output', help='Directory in which are the destination photos', default='CAFEDECA')
+        '-o',
+        '--directory-output',
+        help='Directory in which are the destination photos',
+        default='CAFEDECA')
     time_delta = parser.add_argument_group('Time delta')
     time_delta.add_argument(
-        '-a', '--add', help='Add time delta to date in EXIF data', action='store_true')
-    time_delta.add_argument('-s', '--substract',
-                            help='Substract time delta to date in EXIF data', action='store_true')
+        '-a',
+        '--add',
+        help='Add time delta to date in EXIF data',
+        action='store_true')
     time_delta.add_argument(
-        '-d', '--day', help='Number of days in the time delta', type=int, metavar='N')
+        '-s',
+        '--substract',
+        help='Substract time delta to date in EXIF data',
+        action='store_true')
     time_delta.add_argument(
-        '-H', '--hour', help='Number of hours in the time delta', type=int, metavar='N')
+        '-d',
+        '--day',
+        help='Number of days in the time delta',
+        type=int,
+        metavar='N')
     time_delta.add_argument(
-        '-m', '--minute', help='Number of minutes in the time delta', type=int, metavar='N')
+        '-H',
+        '--hour',
+        help='Number of hours in the time delta',
+        type=int,
+        metavar='N')
     time_delta.add_argument(
-        '-S', '--second', help='Number of seconds in the time delta', type=int, metavar='N')
+        '-m',
+        '--minute',
+        help='Number of minutes in the time delta',
+        type=int,
+        metavar='N')
+    time_delta.add_argument(
+        '-S',
+        '--second',
+        help='Number of seconds in the time delta',
+        type=int,
+        metavar='N')
     args = parser.parse_args()
 
     if args.directory_output == 'CAFEDECA':
         args.directory_output = args.directory_input + '/links'
 
     process(args)
+
 
 if __name__ == "__main__":
     main()
