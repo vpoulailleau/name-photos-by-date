@@ -10,7 +10,7 @@ import subprocess
 
 
 logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
@@ -33,13 +33,14 @@ def compute_sha1(filepath):
 
 
 def extract_date(filepath):
+    date = None
     if filepath.lower().endswith(('.jpg', '.jpeg')):
         date = extract_date_image(filepath)
     if date:
         return date
     else:
         m = re.search(
-            r'(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})\.\w{1,4}',
+            r'\D(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})\D',
             filepath)
         if m and m.group(1).startswith('20'):
             return datetime.datetime(
@@ -128,7 +129,7 @@ def process(args):
         if extension in ('jpg', 'jpeg', 'mp4', '3gp'):
             images.append(full_image_name)
 
-    pool = Pool(processes=8)
+    pool = Pool(processes=16)
     pool.map(rename_an_image, images, 10)
 
 
