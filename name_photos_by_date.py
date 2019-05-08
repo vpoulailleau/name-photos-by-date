@@ -8,6 +8,7 @@ import re
 import shutil
 import subprocess
 
+
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 stream_handler = logging.StreamHandler()
@@ -32,6 +33,25 @@ def compute_sha1(filepath):
 
 
 def extract_date(filepath):
+    if filepath.lower().endswith(('.jpg', '.jpeg')):
+        date = extract_date_image(filepath)
+    if date:
+        return date
+    else:
+        m = re.search(
+            r'(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})\.\w{1,4}',
+            filepath)
+        if m and m.group(1).startswith('20'):
+            return datetime.datetime(
+                int(m.group(1)),
+                int(m.group(2)),
+                int(m.group(3)),
+                int(m.group(4)),
+                int(m.group(5)),
+                int(m.group(6)))
+
+
+def extract_date_image(filepath):
     with subprocess.Popen(
             'identify -verbose {}'.format(filepath.replace(' ', '\\ ')),
             shell=True,
@@ -86,10 +106,11 @@ def rename_an_image(filepath):
     logger.debug('managing ' + filepath)
     date_time_original = extract_date(filepath)
     if date_time_original:
+        extension = filepath.split('.')[-1]
         date = correct_date(date_time_original, args)
         date = date.strftime('%Y-%m-%d--%H-%M-%S')
         sha1 = compute_sha1(filepath)
-        new_file_name = f'{args.directory_output}/{date}_{sha1}.jpg'
+        new_file_name = f'{args.directory_output}/{date}_{sha1}.{extension}'
         shutil.move(filepath, new_file_name)
         logger.info('created ' + new_file_name)
 
@@ -104,7 +125,7 @@ def process(args):
     for entry in os.listdir(args.directory_input):
         extension = entry.split('.')[-1].lower()
         full_image_name = args.directory_input + '/' + entry
-        if extension in ('jpg', 'jpeg'):
+        if extension in ('jpg', 'jpeg', 'mp4', '3gp'):
             images.append(full_image_name)
 
     pool = Pool(processes=8)
