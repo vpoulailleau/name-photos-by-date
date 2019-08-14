@@ -69,7 +69,7 @@ def extract_date_image(filepath):
                         int(m.group(5)),
                         int(m.group(6)),
                     )
-        logger.error("Can't parse imagemagick output")
+        logger.error(f"Can't parse imagemagick output for {filepath[-30:]}")
 
 
 def correct_date(date, args):
