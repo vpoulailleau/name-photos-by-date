@@ -9,7 +9,7 @@ from multiprocessing import Pool
 
 import simplelogging
 
-logger = simplelogging.get_logger(console_level=simplelogging.DEBUG)
+logger = simplelogging.get_logger(console_level=simplelogging.INFO)
 
 
 def compute_sha1(filepath):
