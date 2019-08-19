@@ -2,6 +2,7 @@ import argparse
 import datetime
 import hashlib
 import os
+import pathlib
 import re
 import shutil
 import subprocess
@@ -43,6 +44,16 @@ def extract_date(filepath):
                 int(m.group(5)),
                 int(m.group(6)),
             )
+    if filepath.lower().endswith(".mp4"):
+        date = extract_date_mp4_thm(filepath)
+        return date
+
+
+def extract_date_mp4_thm(filepath):
+    path = pathlib.Path(filepath)
+    thm = path.parent / (path.stem + ".THM")
+    if thm.exists():
+        return extract_date_image(str(thm))
 
 
 def extract_date_image(filepath):
