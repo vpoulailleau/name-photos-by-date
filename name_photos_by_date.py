@@ -32,7 +32,10 @@ def extract_date(filepath):
     if date:
         return date
     else:
-        m = re.search(r"\D(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})\D", filepath)
+        m = re.search(
+            r"\D(\d{4})[-_]?(\d{2})[-_]?(\d{2})[-_](\d{2})[-_]?(\d{2})[-_]?(\d{2})\D",
+            filepath,
+        )
         if m and m.group(1).startswith("20"):
             return datetime.datetime(
                 int(m.group(1)),
