@@ -32,9 +32,7 @@ def extract_date(filepath):
     if date:
         return date
     else:
-        m = re.search(
-            r"\D(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})\D", filepath
-        )
+        m = re.search(r"\D(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})\D", filepath)
         if m and m.group(1).startswith("20"):
             return datetime.datetime(
                 int(m.group(1)),
@@ -43,6 +41,16 @@ def extract_date(filepath):
                 int(m.group(4)),
                 int(m.group(5)),
                 int(m.group(6)),
+            )
+        m = re.search(r"\D(\d{4})(\d{2})(\d{2})-WA", filepath)
+        if m and m.group(1).startswith("20"):
+            return datetime.datetime(
+                int(m.group(1)),
+                int(m.group(2)),
+                int(m.group(3)),
+                0,
+                0,
+                0,
             )
     if filepath.lower().endswith(".mp4"):
         date = extract_date_mp4_thm(filepath)
@@ -102,9 +110,7 @@ def correct_date(date, args):
             date += delta
         else:
             date -= delta
-        logger.debug(
-            "after time delta: {}".format(date.strftime("%Y-%m-%d--%H-%M-%S"))
-        )
+        logger.debug("after time delta: {}".format(date.strftime("%Y-%m-%d--%H-%M-%S")))
     return date
 
 
