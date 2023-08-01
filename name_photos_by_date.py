@@ -64,7 +64,9 @@ def extract_date_mp4_thm(filepath):
     path = pathlib.Path(filepath)
     thm = path.parent / (path.stem + ".THM")
     if thm.exists():
-        return extract_date_image(str(thm))
+        date = extract_date_image(str(thm))
+        thm.unlink()
+        return date
 
 
 def extract_date_image(filepath):
