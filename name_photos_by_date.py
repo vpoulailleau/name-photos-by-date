@@ -31,30 +31,29 @@ def extract_date(filepath):
         date = extract_date_image(filepath)
     if date:
         return date
-    else:
-        m = re.search(
-            r"\D(\d{4})[-_]?(\d{2})[-_]?(\d{2})[-_](\d{2})[-_]?(\d{2})[-_]?(\d{2})\D",
-            filepath,
+    m = re.search(
+        r"\D(\d{4})[-_]?(\d{2})[-_]?(\d{2})[-_]+(\d{2})[-_]?(\d{2})[-_]?(\d{2})\D",
+        filepath,
+    )
+    if m and m.group(1).startswith("20"):
+        return datetime.datetime(
+            int(m.group(1)),
+            int(m.group(2)),
+            int(m.group(3)),
+            int(m.group(4)),
+            int(m.group(5)),
+            int(m.group(6)),
         )
-        if m and m.group(1).startswith("20"):
-            return datetime.datetime(
-                int(m.group(1)),
-                int(m.group(2)),
-                int(m.group(3)),
-                int(m.group(4)),
-                int(m.group(5)),
-                int(m.group(6)),
-            )
-        m = re.search(r"\D(\d{4})(\d{2})(\d{2})-WA", filepath)
-        if m and m.group(1).startswith("20"):
-            return datetime.datetime(
-                int(m.group(1)),
-                int(m.group(2)),
-                int(m.group(3)),
-                0,
-                0,
-                0,
-            )
+    m = re.search(r"\D(\d{4})(\d{2})(\d{2})-WA", filepath)
+    if m and m.group(1).startswith("20"):
+        return datetime.datetime(
+            int(m.group(1)),
+            int(m.group(2)),
+            int(m.group(3)),
+            0,
+            0,
+            0,
+        )
     if filepath.lower().endswith(".mp4"):
         date = extract_date_mp4_thm(filepath)
         return date
@@ -109,7 +108,7 @@ def correct_date(date, args):
             delta += datetime.timedelta(seconds=args.second)
 
         logger.debug(
-            "before time delta: {}".format(date.strftime("%Y-%m-%d--%H-%M-%S"))
+            "before time delta: {}".format(date.strftime("%Y-%m-%d--%H-%M-%S")),
         )
         if args.add:
             date += delta
@@ -151,7 +150,7 @@ def process(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Converts images file names according to their dates"
+        description="Converts images file names according to their dates",
     )
     parser.add_argument(
         "-i",
