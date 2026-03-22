@@ -1,3 +1,4 @@
+from typing import Union
 import argparse
 import datetime
 import hashlib
@@ -68,7 +69,7 @@ def extract_date_mp4_thm(filepath):
         return date
 
 
-def extract_date_image(filepath):
+def extract_date_image(filepath) -> Union[datetime.datetime, None]:
     with subprocess.Popen(
         "identify -verbose {}".format(filepath.replace(" ", "\\ ")),
         shell=True,
@@ -76,10 +77,12 @@ def extract_date_image(filepath):
         universal_newlines=True,
     ) as proc:
         for line in proc.stdout.readlines():
-            if "DateTimeOriginal" in line:
+            if "date" in line.lower():
+                print(line, end="")
+            if "DateTimeOriginal" in line or "exif:DateTime" in line:
                 logger.debug(line)
                 m = re.search(
-                    r"DateTimeOriginal: (\d{4}):(\d{2}):(\d{2})\s+(\d{2}):(\d{2}):(\d{2})",
+                    r"[a-zA-Z:]+: (\d{4}):(\d{2}):(\d{2})\s+(\d{2}):(\d{2}):(\d{2})",
                     line,
                 )
                 if m:
@@ -93,6 +96,7 @@ def extract_date_image(filepath):
                         int(m.group(6)),
                     )
         logger.error(f"Can't parse imagemagick output for {filepath[-30:]}")
+        return None
 
 
 def correct_date(date, args):
