@@ -29,7 +29,10 @@ def compute_sha1(filepath):
 def extract_date(filepath):
     date = None
     if filepath.lower().endswith((".jpg", ".jpeg")):
-        date = extract_date_image(filepath)
+        try:
+            date = extract_date_image(filepath)
+        except UnicodeDecodeError:
+            pass
     if date:
         return date
     m = re.search(
