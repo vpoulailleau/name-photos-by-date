@@ -76,6 +76,7 @@ def extract_date_image(filepath) -> Union[datetime.datetime, None]:
         stdout=subprocess.PIPE,
         universal_newlines=True,
     ) as proc:
+        modification_date = None
         for line in proc.stdout.readlines():
             if "date" in line.lower():
                 print(line, end="")
@@ -95,8 +96,28 @@ def extract_date_image(filepath) -> Union[datetime.datetime, None]:
                         int(m.group(5)),
                         int(m.group(6)),
                     )
-        logger.error(f"Can't parse imagemagick output for {filepath[-30:]}")
-        return None
+            if "date:create" in line or "date:modify" in line:
+                logger.debug(line)
+                m = re.search(
+                    r"[a-zA-Z:]+: (\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})",
+                    line,
+                )
+                if m:
+                    logger.debug("match")
+                    date = datetime.datetime(
+                        int(m.group(1)),
+                        int(m.group(2)),
+                        int(m.group(3)),
+                        int(m.group(4)),
+                        int(m.group(5)),
+                        int(m.group(6)),
+                    )
+                    if modification_date is None or date < modification_date:
+                        modification_date = date
+
+        if modification_date is None:
+            logger.error(f"Can't parse imagemagick output for {filepath[-30:]}")
+        return modification_date
 
 
 def correct_date(date, args):
