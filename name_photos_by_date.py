@@ -36,7 +36,7 @@ def extract_date(filepath):
     if date:
         return date
     m = re.search(
-        r"\D(\d{4})[-_]?(\d{2})[-_]?(\d{2})[-_]+(\d{2})[-_]?(\d{2})[-_]?(\d{2})\D",
+        r"(?:^|\D)(\d{4})[-_]?(\d{2})[-_]?(\d{2})[-_ ]+(\d{2})[-_]?(\d{2})[-_]?(\d{2})\D",
         filepath,
     )
     if m and m.group(1).startswith("20"):
@@ -121,6 +121,7 @@ def extract_date_image(filepath) -> Union[datetime.datetime, None]:
         if modification_date is None:
             logger.error(f"Can't parse imagemagick output for {filepath[-30:]}")
         return modification_date
+    return None
 
 
 def correct_date(date, args):
@@ -169,7 +170,7 @@ def process(args):
     for entry in os.listdir(args.directory_input):
         extension = entry.split(".")[-1].lower()
         full_image_name = args.directory_input + "/" + entry
-        if extension in ("jpg", "jpeg", "mp4", "3gp"):
+        if extension in ("jpg", "jpeg", "mp4", "3gp", "png"):
             images.append(full_image_name)
 
     pool = Pool(processes=16)
