@@ -59,7 +59,7 @@ def extract_date(filepath):
             0,
         )
     if filepath.lower().endswith(".mp4"):
-        date = extract_date_mp4_thm(filepath)
+        date = extract_date_mp4_thm(filepath) or extract_date_m01_xml(filepath)
         return date
 
 
@@ -70,6 +70,29 @@ def extract_date_mp4_thm(filepath):
         date = extract_date_image(str(thm))
         thm.unlink()
         return date
+
+
+def extract_date_m01_xml(filepath) -> Union[datetime.datetime, None]:
+    path = pathlib.Path(filepath)
+    xml = path.parent / (path.stem + "M01.XML")
+    if xml.exists():
+        with open(xml, "r") as f:
+            for line in f.readlines():
+                m = re.search(
+                    r"<CreationDate value=\"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).*\"/>",
+                    line,
+                )
+                if m:
+                    xml.unlink()
+                    return datetime.datetime(
+                        int(m.group(1)),
+                        int(m.group(2)),
+                        int(m.group(3)),
+                        int(m.group(4)),
+                        int(m.group(5)),
+                        int(m.group(6)),
+                    )
+    return None
 
 
 def extract_date_image(filepath) -> Union[datetime.datetime, None]:
