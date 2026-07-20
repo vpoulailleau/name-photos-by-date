@@ -193,7 +193,7 @@ def process(args):
     for entry in os.listdir(args.directory_input):
         extension = entry.split(".")[-1].lower()
         full_image_name = args.directory_input + "/" + entry
-        if extension in ("jpg", "jpeg", "mp4", "3gp", "png"):
+        if extension in ("jpg", "jpeg", "mp4", "3gp", "png", "heic"):
             images.append(full_image_name)
 
     pool = Pool(processes=16)
